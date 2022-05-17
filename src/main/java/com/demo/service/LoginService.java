@@ -4,7 +4,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.demo.cache.CacheStore;
 import com.demo.entity.LoginTicket;
 import com.demo.entity.QrCodeStatusEnum;
-import com.demo.entity.User;
+import com.demo.entity.Visitor;
+import com.demo.repository.VisitorRepository;
 import com.demo.utils.CommonUtil;
 import com.demo.utils.HostHolder;
 import com.demo.utils.LoginConstant;
@@ -29,8 +30,9 @@ public class LoginService {
     @Autowired
     private HostHolder hostHolder;
 
+
     @Autowired
-    private UserService userService;
+    private VisitorRepository visitorRepository;
 
     public String createQrImg() {
         // uuid
@@ -61,8 +63,8 @@ public class LoginService {
                     expired != null &&
                     expired >= 0;
             if (valid) {
-                User user = hostHolder.getUser();
-                if (user == null) {
+                Visitor visitor = hostHolder.getVisitor();
+                if (visitor == null) {
                     throw new RuntimeException("用户未登录");
                 }
                 // 修改扫码状态
@@ -72,7 +74,7 @@ public class LoginService {
                     condition.signal();
                     CONDITION_CONTAINER.remove(uuid);
                 }
-                loginTicket.setUserId(user.getUserId());
+                loginTicket.setId(visitor.getId());
                 cacheStore.put(ticketKey, loginTicket, expired, TimeUnit.SECONDS);
 
                 // 生成一次性 token, 用于之后的确认请求
@@ -138,14 +140,15 @@ public class LoginService {
             }
             // 用户扫码后向 PC 端返回头像信息
             if (statusEnum == QrCodeStatusEnum.SCANNED) {
-                User user = userService.getCurrentUser(loginTicket.getUserId());
-                data.put("avatar", user.getAvatar());
+                Visitor visitor = visitorRepository.findById(loginTicket.getId()).orElse(null);
+//                User user = userService.getCurrentUser(loginTicket.getId());
+                data.put("avatar", "/avatar.jpg");
             }
 
             // 用户确认后为 PC 端生成 access_token
             if (statusEnum == QrCodeStatusEnum.CONFIRMED) {
                 String accessToken = CommonUtil.generateUUID();
-                cacheStore.put(CommonUtil.buildAccessTokenKey(accessToken), loginTicket.getUserId(), LoginConstant.ACCESS_TOKEN_EXPIRE_TIME, TimeUnit.SECONDS);
+                cacheStore.put(CommonUtil.buildAccessTokenKey(accessToken), loginTicket.getId(), LoginConstant.ACCESS_TOKEN_EXPIRE_TIME, TimeUnit.SECONDS);
                 data.put("access_token", accessToken);
             }
 

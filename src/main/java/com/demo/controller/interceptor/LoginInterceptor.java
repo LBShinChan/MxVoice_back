@@ -1,8 +1,8 @@
 package com.demo.controller.interceptor;
 
 import com.demo.cache.CacheStore;
-import com.demo.entity.User;
-import com.demo.service.UserService;
+import com.demo.entity.Visitor;
+import com.demo.repository.VisitorRepository;
 import com.demo.utils.CommonUtil;
 import com.demo.utils.HostHolder;
 import org.apache.commons.lang3.StringUtils;
@@ -22,8 +22,9 @@ public class LoginInterceptor implements HandlerInterceptor {
     @Autowired
     private CacheStore cacheStore;
 
+
     @Autowired
-    private UserService userService;
+    private VisitorRepository visitorRepository;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
@@ -31,9 +32,18 @@ public class LoginInterceptor implements HandlerInterceptor {
         String accessToken = request.getHeader("access_token");
         // access_token 存在
         if (StringUtils.isNotEmpty(accessToken)) {
-            String userId = (String) cacheStore.get(CommonUtil.buildAccessTokenKey(accessToken));
-            User user = userService.getCurrentUser(userId);
-            hostHolder.setUser(user);
+//            String userId = (String) cacheStore.get(CommonUtil.buildAccessTokenKey(accessToken));
+//            User user = userService.getCurrentUser(userId);
+//            hostHolder.setUser(user);
+            Visitor visitor = visitorRepository.findByAccessToken(accessToken).orElse(null);
+
+            if(visitor==null){
+                int id = (int) cacheStore.get(CommonUtil.buildAccessTokenKey(accessToken));
+                visitor = visitorRepository.findById(id).orElse(null);
+                hostHolder.setVisitor(visitor);
+                return true;
+            }
+            hostHolder.setVisitor(visitor);
         }
         return true;
     }

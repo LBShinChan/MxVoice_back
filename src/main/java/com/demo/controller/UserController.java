@@ -1,8 +1,7 @@
 package com.demo.controller;
 
 import com.demo.entity.Response;
-import com.demo.entity.User;
-import com.demo.service.UserService;
+import com.demo.entity.Visitor;
 import com.demo.utils.HostHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -16,18 +15,15 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class UserController {
 
     @Autowired
-    UserService userService;
-
-    @Autowired
     private HostHolder hostHolder;
 
     @RequestMapping(path = "/getUser", method = RequestMethod.GET)
     @ResponseBody
-    public Response getUser() {
-        User user = hostHolder.getUser();
-        if (user == null) {
+    public Response getVisitor() {
+        Visitor visitor = hostHolder.getVisitor();
+        if (visitor == null) {
             return Response.createErrorResponse("用户未登录");
         }
-        return Response.createResponse(null, user);
+        return Response.createResponse(null, visitor);
     }
 }

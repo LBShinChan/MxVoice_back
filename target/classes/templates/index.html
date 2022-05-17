@@ -34,7 +34,7 @@
                 success: function (response) {
                     if (response["code"] !== "500") {
                         document.getElementById("login").style.display = "none";
-                        document.getElementById("current_user").innerText = response["data"]["userName"];
+                        document.getElementById("current_user").innerText = response["data"]["username"];
                         document.getElementById("current_user").style.display = "block";
                     }
                 }

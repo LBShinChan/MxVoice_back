@@ -1,22 +1,22 @@
 package com.demo.utils;
 
-import com.demo.entity.User;
+import com.demo.entity.Visitor;
 import org.springframework.stereotype.Component;
 
 @Component
 public class HostHolder {
 
-    private ThreadLocal<User> users = new ThreadLocal<>();
+    private ThreadLocal<Visitor> visitors = new ThreadLocal<>();
 
-    public void setUser(User user) {
-        users.set(user);
+    public void setVisitor(Visitor visitor) {
+        visitors.set(visitor);
     }
 
-    public User getUser() {
-        return users.get();
+    public Visitor getVisitor() {
+        return visitors.get();
     }
 
     public void clear() {
-        users.remove();
+        visitors.remove();
     }
 }

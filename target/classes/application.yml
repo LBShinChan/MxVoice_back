@@ -3,3 +3,30 @@ spring:
     database: 11
     host: localhost
     port: 6379
+  mail:
+    host: smtp.163.com
+    port: 465
+    username: cmx_ah@163.com
+    password: XOAQNKVEKWFYCIZS
+    protocol: smtps
+    properties:
+      mail:
+        smtp:
+          ssl:
+            enable: true
+  datasource:
+    url: jdbc:mysql://localhost:3306/test?serverTimezone=UTC
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update # 表内有数据时不会清空, 只会更新
+    # 控制台显示SQL
+    show-sql: true
+server:
+  servlet:
+    context-path: /
+mxvoice:
+  path:
+    domain: http://192.168.10.61:8080

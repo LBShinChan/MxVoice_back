@@ -4,7 +4,6 @@ import cn.hutool.extra.qrcode.QrCodeUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.demo.entity.Response;
 import com.demo.service.LoginService;
-import com.demo.service.UserService;
 import com.demo.utils.CommonUtil;
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +19,6 @@ public class LoginController {
     @Autowired
     LoginService loginService;
 
-    @Autowired
-    UserService userService;
 
     @RequestMapping(path = "/getQrCodeImg", method = RequestMethod.GET)
     public String createQrCodeImg(Model model) {
@@ -45,9 +42,11 @@ public class LoginController {
     /*
     以下两个方法用来模拟手机端的操作
      */
-    @RequestMapping(path = "/scan", method = RequestMethod.GET)
+    @RequestMapping(path = "/scan", method = RequestMethod.POST)
     @ResponseBody
-    public String scanQrCodeImg(String uuid) {
+    public String scanQrCodeImg(@RequestBody JSONObject jsonParam) {
+        String uuid = jsonParam.getString("uuid");
+        String username = jsonParam.getString("username");
         System.out.println("扫码成功！");
         JSONObject data = loginService.scanQrCodeImg(uuid);
         if (data.getBoolean("valid")) {
@@ -63,7 +62,7 @@ public class LoginController {
     public String confirmLogin(String uuid) {
         boolean logged = loginService.confirmLogin(uuid);
         String msg = logged ? "登录成功!" : "二维码已过期!";
-        int code = logged? 200:400;
+        int code = logged? 200:403;
         return CommonUtil.getJSONString(code, msg);
 //        return Response.createResponse(msg, logged);
     }

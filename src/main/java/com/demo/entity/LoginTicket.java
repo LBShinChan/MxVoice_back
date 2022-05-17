@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class LoginTicket {
 
-    private String userId;
+    private int Id;
 
     private int status;
 }
